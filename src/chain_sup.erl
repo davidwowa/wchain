@@ -28,6 +28,10 @@ start_link() ->
 
 %% Child :: {Id,StartFunc,Restart,Shutdown,Type,Modules}
 init([]) ->
+	lager:start(),
+	lager:info("~s is ~s!", [lager, cool]),
+	lager:warning("but pay ~s!", [attention]),
+	lager:error("there is always some ~s", [error]),
     {ok, { {one_for_all, 0, 1}, []} }.
 
 %%====================================================================
