@@ -1,4 +1,4 @@
-chain - test implementation for blockchain
+wchain
 =====
 
 An OTP application
