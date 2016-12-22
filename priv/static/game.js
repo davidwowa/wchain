@@ -4,10 +4,10 @@ var socket = new WebSocket("ws://localhost:5555/websocket");
 function init() {
 	console.log("init client");
 	if (!("WebSocket" in window)) {
-//		console.log("websockets not supported");
+		// console.log("websockets not supported");
 		document.getElementById("status").innerHTML = "<p><span style=\"color: red;\">websockets are not supported </span></p>";
 	} else {
-//		console.log("websockets are supported");
+		// console.log("websockets are supported");
 		document.getElementById("status").innerHTML = "<p><span style=\"color: green;\">websockets are supported </span></p>";
 	}
 };
@@ -18,7 +18,7 @@ init();
 // callback-Funktion wird gerufen, wenn die Verbindung erfolgreich aufgebaut
 // werden konnte
 socket.onopen = function() {
-//	console.log("Verbindung wurde erfolgreich aufgebaut");
+	// console.log("Verbindung wurde erfolgreich aufgebaut");
 	document.getElementById("status").innerHTML = "<p><span style=\"color: green;\">connection is ok</span></p>";
 };
 
@@ -29,13 +29,28 @@ socket.onmessage = function(messageEvent) {
 
 // callback-Funktion wird gerufen, wenn eine Fehler auftritt
 socket.onerror = function(errorEvent) {
-//	console.log("Error! Die Verbindung wurde unerwartet geschlossen");
+	// console.log("Error! Die Verbindung wurde unerwartet geschlossen");
 	document.getElementById("status").innerHTML = "<p><span style=\"color: red;\">error! connection lost</span></p>";
 };
 
 socket.onclose = function(closeEvent) {
-//	console.log('Die Verbindung wurde geschlossen --- Code: ' + closeEvent.code
-//			+ ' --- Grund: ' + closeEvent.reason);
+	// console.log('Die Verbindung wurde geschlossen --- Code: ' +
+	// closeEvent.code
+	// + ' --- Grund: ' + closeEvent.reason);
 	document.getElementById("status").innerHTML = '<p><span style=\"color: red;\">Connection closed --- Code: '
 			+ closeEvent.code + ' reason: ' + closeEvent.reason + '</span></p>';
 };
+
+// game logic
+
+function run() {
+	console.log("RUN!");
+}
+
+function generateUUID() {
+	console.log("Generate uuid");
+}
+
+function mine() {
+	console.log("Mine");
+}

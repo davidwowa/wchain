@@ -3,33 +3,67 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<link href="css/css.css" rel="stylesheet" type="text/css" />
+<link href="css/ok.css" rel="stylesheet" type="text/css" />
+<link href="css/error.css" rel="stylesheet" type="text/css" />
+<link href="css/run.css" rel="stylesheet" type="text/css" />
+<link href="css/winner.css" rel="stylesheet" type="text/css" />
+<link href="css/status.css" rel="stylesheet" type="text/css" />
+
 <title>HashChain Game</title>
 </head>
 
 <body>
 	<div id="header">
-		<h1>HashChain game</h1>
-		<div id="status"></div>
+		<h1 class="status_block">HashChain game</h1>
+		<div id="status" class="status_block"></div>
+		<div id="clients">CLIENTS:TODO</div>
 	</div>
 
-	<div id="navigation">
-		<p id="connecting">
-			<input type='text' id="server" value=""></input>
-			<button type="button" onclick="toggle_connection()">connection</button>
-		</p>
-		<div id="connected">
+	<div id="blocks" class="outer">
+		<div id="block0" class="inner">
+			<label class="block_info block_error">Block 0</label>
 			<p>
-				<input type='text' id="send_txt" value=></input>
-				<button type="button" onclick="sendTxt();">send</button>
+				<label id="dataUUID0">UUID</label>
+				<button type="button" onclick="generateUUID()">Generate
+					UUID</button>
+				<br /> <label id="dataHash0">HASH</label>
+				<button type="button" onclick="mine()">Mine</button>
 			</p>
 		</div>
-
-		<div id="content">
-			<button id="clear" onclick="clearScreen()">Clear text</button>
-			<div id="output"></div>
+		<div id="block1" class="inner">
+			<label class="block_info block_error">Block 1</label>
+			<p>
+				<label id="dataUUID1">UUID</label>
+				<button type="button" onclick="generateUUID()">Generate
+					UUID</button>
+				<br /> <label id="dataHash1">HASH</label>
+				<button type="button" onclick="mine()">Mine</button>
+			</p>
 		</div>
-
+		<div id="block2" class="inner">
+			<label class="block_info block_error">Block 2</label>
+			<p>
+				<label id="dataUUID2">UUID</label>
+				<button type="button" onclick="generateUUID()">Generate
+					UUID</button>
+				<br /> <label id="dataHash2">HASH</label>
+				<button type="button" onclick="mine()">Mine</button>
+			</p>
+		</div>
 	</div>
+
+	<div id="buttons_content">
+		<button id="clear" onclick="run()">Run!</button>
+		<button id="reset" onclick="reset()">Reset</button>
+		<div id="output"></div>
+	</div>
+
+	<div id="winner_content">
+		<label class="block_info block_winner">WINNER</label>
+		<div id="output"></div>
+	</div>
+
 	<!-- 	scripts -->
 	<script type="text/javascript" src="static/game.js">
 		

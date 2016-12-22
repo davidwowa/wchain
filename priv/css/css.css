@@ -1,0 +1,40 @@
+.date {
+	font-size: 85%;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+	color: #FFFFCC;
+	font-size: 10px;
+	font-family: "Lucida Grande", Verdana, Helvetica, Arial, sans-serif;
+	font-weight: 100;
+}
+
+.headline {
+	font: bold 34px "Century Schoolbook", Georgia, Times, serif;
+	color: #FFFFCC;
+	line-height: 90%;
+	margin: .2em 0 .4em 0;
+	letter-spacing: -2px;
+}
+
+.tag {
+	color: #76879b;
+	font-size: 10px;
+	margin: 5px;
+	font-family: "Lucida Grande", Verdana, Helvetica, Arial, sans-serif;
+	font-size: 11px;
+}
+
+.outer {
+	display: table-cell;
+	/* 	vertical-align: middle; */
+}
+
+.inner {
+	display: inline-block;
+	border: 1px solid #000;
+	background-color: #58a518;
+}
+
+.block_info {
+	background-color: #a9d6ff;
+}

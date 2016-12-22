@@ -36,9 +36,10 @@ setup_cowboy() ->
 	lager:info("setup cowboy server"),
 	Dispatch = cowboy_router:compile([
 									  {'_', [                                                                       %% Hostname fuer den die Routen gelten
-												{"/", cowboy_static, {priv_file, wchain, "index.html"}},              %% Statische Datei aus dem priv-Verzeichnis
+												{"/", cowboy_static, {priv_file, wchain, "index.html"}},            
 												{"/websocket", ws_handler, []},            %% /websocket wird von dem Modul ws_handler ausgeliefert
-												{"/static/[...]", cowboy_static, {priv_dir, wchain, "static"}}       %% Statische Route, alle Dateien werden aus priv/static/... geladen
+												{"/static/[...]", cowboy_static, {priv_dir, wchain, "static"}},
+												{"/css/[...]", cowboy_static, {priv_dir, wchain, "css"}}
 											]}
 									 ]),
 	{ok, _} = cowboy:start_http(http, 100, [{port, 5555}], [{env, [{dispatch, Dispatch}]}]),                        %% HTTP-Server starten
