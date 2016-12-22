@@ -1,5 +1,5 @@
 "use strict";
-var socket = new WebSocket("ws://localhost:5555/websocket");
+var socket = new WebSocket("ws://localhost:5555/hashchain");
 
 function init() {
 	console.log("init client");
@@ -25,6 +25,7 @@ socket.onopen = function() {
 // callback-Funktion wird gerufen, wenn eine neue Websocket-Nachricht eintrifft
 socket.onmessage = function(messageEvent) {
 	console.log(messageEvent.data);
+	document.getElementById("dataUUID0").innerHTML = messageEvent.data;
 };
 
 // callback-Funktion wird gerufen, wenn eine Fehler auftritt
@@ -49,8 +50,24 @@ function run() {
 
 function generateUUID() {
 	console.log("Generate uuid");
+	if(socket.readyState == socket.OPEN){
+		console.log("get random UUID");
+		socket.send("get random UUID");
+    } else {
+        console.log('websocket is not connected'); 
+    };
 }
 
 function mine() {
 	console.log("Mine");
+	if(socket.readyState == socket.OPEN){
+		console.log("get random UUID");
+		socket.send(document.getElementById("dataUUID0").innerHTML);
+    } else {
+        console.log('websocket is not connected'); 
+    };
+}
+
+function reset(){
+	console.log("reset");
 }

@@ -37,7 +37,7 @@ setup_cowboy() ->
 	Dispatch = cowboy_router:compile([
 									  {'_', [                                                                       %% Hostname fuer den die Routen gelten
 												{"/", cowboy_static, {priv_file, wchain, "index.html"}},            
-												{"/websocket", ws_handler, []},            %% /websocket wird von dem Modul ws_handler ausgeliefert
+												{"/hashchain", ws_handler, []},            %% /websocket wird von dem Modul ws_handler ausgeliefert
 												{"/static/[...]", cowboy_static, {priv_dir, wchain, "static"}},
 												{"/css/[...]", cowboy_static, {priv_dir, wchain, "css"}}
 											]}
