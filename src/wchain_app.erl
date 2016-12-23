@@ -19,7 +19,6 @@
 start(_StartType, _StartArgs) ->
 	{ok, _Apps1} = application:ensure_all_started(lager),
 	{ok, _Apps2} = application:ensure_all_started(ranch),
-	%% 	lager:start(),
 	lager:info("CLIENT: ~p", [self()]),
 	ok = setup_cowboy(),
 	ok = setup_mnesia(),
@@ -48,7 +47,7 @@ setup_cowboy() ->
 setup_mnesia() ->
 	lager:info("setup mnesia"),
 	{ok, _Apps} = application:ensure_all_started(mnesia, permanent),
-	case mnesia:wait_for_tables([client], 5000) of                      %% Prueft ob alle Tabellen vorhanden sind
+	case mnesia:wait_for_tables([player], 5000) of                      %% Prueft ob alle Tabellen vorhanden sind
 		ok ->
 			ok;
 		_ ->
@@ -60,7 +59,7 @@ setup_mnesia() ->
 install_mnesia_tables() ->
 	mnesia:create_schema([node()]),                                     %% Zunaechst wird ein Schema erzeugt
 	ok = mnesia:start(),
-	mnesia:create_table(client,                                         %% Dann werden Tabellen angelegt
-						[{attributes, record_info(fields, client)},
+	mnesia:create_table(player,                                         %% Dann werden Tabellen angelegt
+						[{attributes, record_info(fields, player)},
 						 {ram_copies, [node()]}]),
 	ok.

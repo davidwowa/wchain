@@ -1,0 +1,87 @@
+.clients_block_online {
+	text-align: center;
+	color: #ae53af;
+	border: 1px solid #000;
+	background-color: #faffc3;
+	font-size: 15px;
+	text-transform: uppercase;
+	font-family: 'Courier New', Courier, 'Lucida Sans Typewriter',
+		'Lucida Typewriter';
+}
+
+.clients_block_offline {
+	text-align: center;
+	color: #ae53af;
+	border: 1px solid #000;
+	background-color: #ff9785;
+	font-size: 15px;
+	text-transform: uppercase;
+	font-family: 'Courier New', Courier, 'Lucida Sans Typewriter',
+		'Lucida Typewriter';
+}
+
+.clients_block_title {
+	text-align: center;
+	color: #ae53af;
+	border: 1px solid #000;
+	background-color: #ffe232;
+	font-size: 25px;
+	text-transform: uppercase;
+	font-family: 'Courier New', Courier, 'Lucida Sans Typewriter',
+		'Lucida Typewriter';
+}
+
+.clients_block_hash {
+	text-align: center;
+	color: #ae53af;
+	border: 1px solid #000;
+	background-color: #71ea0b;
+	font-size: 25px;
+	text-transform: uppercase;
+	font-family: 'Courier New', Courier, 'Lucida Sans Typewriter',
+		'Lucida Typewriter';
+}
+
+.clients_block_uuid {
+	text-align: center;
+	color: #ae53af;
+	border: 1px solid #000;
+	background-color: #c499eb;
+	font-size: 25px;
+	text-transform: uppercase;
+	font-family: 'Courier New', Courier, 'Lucida Sans Typewriter',
+		'Lucida Typewriter';
+}
+
+.clients_block_stop {
+	text-align: center;
+	color: #ae53af;
+	border: 1px solid #000;
+	background-color: #eefaed;
+	font-size: 15px;
+	text-transform: uppercase;
+	font-family: 'Courier New', Courier, 'Lucida Sans Typewriter',
+		'Lucida Typewriter';
+}
+
+.clients_block_reset {
+	text-align: center;
+	color: #ae53af;
+	border: 1px solid #000;
+	background-color: #e1ecf7;
+	font-size: 15px;
+	text-transform: uppercase;
+	font-family: 'Courier New', Courier, 'Lucida Sans Typewriter',
+		'Lucida Typewriter';
+}
+
+.clients_block_winner {
+	text-align: center;
+	color: #ae53af;
+	border: 1px solid #000;
+	background-color: #fdfb01;
+	font-size: 15px;
+	text-transform: uppercase;
+	font-family: 'Courier New', Courier, 'Lucida Sans Typewriter',
+		'Lucida Typewriter';
+}

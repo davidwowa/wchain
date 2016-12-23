@@ -1,0 +1,6 @@
+10 -> get random uuid
+20:uuid -> mine
+30 -> reset
+40 -> stop
+50 -> winner
+60 -> all clients

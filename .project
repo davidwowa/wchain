@@ -20,4 +20,10 @@
 		<nature>org.erlide.core.erlnature</nature>
 		<nature>org.eclipse.wst.common.project.facet.core.nature</nature>
 	</natures>
+	<variableList>
+		<variable>
+			<name>LIBS</name>
+			<value>file:/Users/David/git/wchain/_build/default/lib</value>
+		</variable>
+	</variableList>
 </projectDescription>

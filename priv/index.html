@@ -9,60 +9,38 @@
 <link href="css/run.css" rel="stylesheet" type="text/css" />
 <link href="css/winner.css" rel="stylesheet" type="text/css" />
 <link href="css/status.css" rel="stylesheet" type="text/css" />
+<link href="css/title.css" rel="stylesheet" type="text/css" />
+<link href="css/client.css" rel="stylesheet" type="text/css" />
 
 <title>HashChain Game</title>
 </head>
 
 <body>
 	<div id="header">
-		<h1 class="status_block">HashChain game</h1>
-		<div id="status" class="status_block"></div>
-		<div id="clients">CLIENTS:TODO</div>
+		<div class="hash_game_title">HashChain game</div>
+		<div id="status"></div>
 	</div>
 
-	<div id="blocks" class="outer">
-		<div id="block0" class="inner">
-			<label class="block_info block_error">Block 0</label>
-			<p>
-				<label id="dataUUID0">UUID</label>
-				<button type="button" onclick="generateUUID()">Generate
-					UUID</button>
-				<br /> <label id="dataHash0">HASH</label>
-				<button type="button" onclick="mine()">Mine</button>
-			</p>
-		</div>
-<!-- 		<div id="block1" class="inner"> -->
-<!-- 			<label class="block_info block_error">Block 1</label> -->
-<!-- 			<p> -->
-<!-- 				<label id="dataUUID1">UUID</label> -->
-<!-- 				<button type="button" onclick="generateUUID()">Generate -->
-<!-- 					UUID</button> -->
-<!-- 				<br /> <label id="dataHash1">HASH</label> -->
-<!-- 				<button type="button" onclick="mine()">Mine</button> -->
-<!-- 			</p> -->
-<!-- 		</div> -->
-<!-- 		<div id="block2" class="inner"> -->
-<!-- 			<label class="block_info block_error">Block 2</label> -->
-<!-- 			<p> -->
-<!-- 				<label id="dataUUID2">UUID</label> -->
-<!-- 				<button type="button" onclick="generateUUID()">Generate -->
-<!-- 					UUID</button> -->
-<!-- 				<br /> <label id="dataHash2">HASH</label> -->
-<!-- 				<button type="button" onclick="mine()">Mine</button> -->
-<!-- 			</p> -->
-<!-- 		</div> -->
+	<div id="block0" class="header_block">
+		<p>
+			<label>UUID:</label><label id="dataUUID0">UUID</label><br /> 
+			<label>HASH:</label><label id="dataHash0">HASH</label>
+		</p>
 	</div>
 
-	<div id="buttons_content">
-		<button id="clear" onclick="run()">Run!</button>
-		<button id="reset" onclick="reset()">Reset</button>
+	<div id="buttons_content" class="buttons_block">
+		<button id="buttonUuid" class="btn" type="button" onclick="generateUUID()">Generate UUID</button>
+		<button id="buttonMine" class="btn" type="button" onclick="mine()">Mine</button>
+		<button id="buttonStop" class="btn" type="button" onclick="stop()">Stop</button>
+		<button id="buttonReset" class="btn" type="button" onclick="reset()">Reset</button>
+	</div>
+
+	<div id="winner_content" class="winner">
+		WINNER IS
 		<div id="output"></div>
 	</div>
 
-	<div id="winner_content">
-		<label class="block_info block_winner">WINNER</label>
-		<div id="output"></div>
-	</div>
+	<div id="clients" class="clients_block_title">LOG</div>
 
 	<!-- 	scripts -->
 	<script type="text/javascript" src="static/game.js">

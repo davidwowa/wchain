@@ -1,5 +1,21 @@
-.status_block {
-	text-align : center;
+.status_block_ok {
+	text-align: center;
+	color: green;
 	border: 1px solid #000;
-	background-color: aqua;
+	background-color: #8fffbf;
+	font-size: 25px;
+	text-transform: uppercase;
+	font-family: 'Courier New', Courier, 'Lucida Sans Typewriter',
+		'Lucida Typewriter';
+}
+
+.status_block_error {
+	text-align: center;
+	text-shadow: 3px 2px #ffeb6d;
+	border: 1px solid #000;
+	background-color: #d1a59f;
+	font-size: 25px;
+	text-transform: uppercase;
+	font-family: 'Courier New', Courier, 'Lucida Sans Typewriter',
+		'Lucida Typewriter';
 }

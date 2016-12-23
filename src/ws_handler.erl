@@ -10,64 +10,100 @@
 
 %% Wird beim initialen Verbindungsaufbau aufgerufen und upgradet das Protokoll auf einen Websocket
 init({tcp, http}, _Req, _Opts) ->
-%% 	lager:info("init ~p \n ~p \n ", [_Req, _Opts]),
-	Clients = mnesia:dirty_all_keys(client),
-	lager:info("on init : clients in mnesia : ~p ", [Clients]),
+%% 	mnesia:del_table_copy(player, wchain@mac),
+	Players = mnesia:dirty_all_keys(player),
+	lager:info("on init : players in mnesia : ~p ", [Players]),
 	{upgrade, protocol, cowboy_websocket}.
 
 %% Wird aufgerufen, sobald der Websocket erstellt wurde
 websocket_init(_TransportName, Req, _Opts) ->
-%% 	lager:info("websocket_init ~p \n ~p \n ~p \n", [_TransportName, Req, _Opts]),
-	Client = #client { pid = self(), name = "Guest" },
- 	lager:info("Client: ~p", [self()]),
-	mnesia:dirty_write(Client),
-	{ok, Req, Client}.
+	Player = #player { pid = self(), uuid = uuid:to_string(uuid:v4()), score=0 },
+	lager:info("new player : ~p ~p", [Player#player.uuid, Player#player.pid]),
+	mnesia:dirty_write(Player),
+	NewClientMessage = lists:flatten(io_lib:format("60:~s:~p:~p", [Player#player.uuid, Player#player.score, 1])),
+	lager:info("new player ~p ", [NewClientMessage]),
+	relay_message(NewClientMessage, Player#player.uuid),
+	{ok, Req, Player}.
 
 %% Behandelt eingehende Text-Nachrichten des Websockets
 websocket_handle({text, Msg}, Req, State) ->
-	lager:info("websocket_handle ~p ~p \n", [Msg, State#client.name]),
-	NewMsg = uuid:to_string(uuid:v4()),
-	relay_message(NewMsg, State#client.name),
+	
+	MessageNr = string:sub_string(binary_to_list(Msg), 1, 2),
+	lager:info("incomming message : ~p", [MessageNr]),
+	if
+		MessageNr == "10"->lager:info("generate uuid"),
+						   UUID = uuid:to_string(uuid:v4()),
+						   UUIDasMessage = lists:flatten(io_lib:format("10:~s", [UUID])),
+						   relay_message(UUIDasMessage, State#player.uuid);
+		MessageNr == "20"->lager:info("mine hash"),
+						   String = binary_to_list(Msg),
+						   Idx = string:cspan(String, ":"),
+						   UUID = string:sub_string(String, Idx, string:len(String)),
+						   {Hash, Count} = my_sha:generate_sha(UUID, crypto:hash_init(md5), 0),
+						   Player = #player {pid=State#player.pid, uuid = State#player.uuid, score = Count, current_uuid=UUID},
+						   mnesia:dirty_write(Player),
+						   RelayMessage = lists:flatten(io_lib:format("20:~s", [Hash])),
+						   relay_message(RelayMessage, State#player.uuid);
+		MessageNr == "30"->lager:info("reset"),
+						   RelayMessage = lists:flatten(io_lib:format("30:~s", ["RESET"])),
+						   relay_message(RelayMessage, State#player.uuid);
+		MessageNr == "40"->lager:info("stop"),
+						   RelayMessage = lists:flatten(io_lib:format("40:~s", ["STOP"])),
+						   relay_message(RelayMessage, State#player.uuid);
+		MessageNr == "50"->lager:info("winner"),
+						   Winner = "YOU",
+						   RelayMessage = lists:flatten(io_lib:format("50:~s", [Winner])),
+						   relay_message(RelayMessage, State#player.uuid);
+		MessageNr == "60"->lager:info("update palyers information");
+		true -> lager:info("unknown message")
+	end,
 	{ok, Req, State};
 websocket_handle(_Data, Req, State) ->
-	lager:info("websocket_handle ~p ~p \n", [_Data, State#client.name]),
 	{ok, Req, State}.
 
+%% traverse_table_and_show(Table_name)->
+%% 	Iterator =  fun(Rec,_)->
+%% 						io:format("~p~n",[Rec]),
+%% 						[]
+%% 				end,
+%% 	case mnesia:is_transaction() of
+%% 		true -> mnesia:foldl(Iterator,[],Table_name);
+%% 		false -> 
+%% 			Exec = fun({Fun,Tab}) -> mnesia:foldl(Fun, [],Tab) end,
+%% 			mnesia:activity(transaction,Exec,[{Iterator,Table_name}],mnesia_frag)
+%% 	end.
+
 %% Behandelt eingehende Nachrichten anderer Erlang-Prozesse
-websocket_info({{name, Name}, {message, Message}}, Req, State) when erlang:is_list(Message) andalso erlang:is_list(Name) ->
-%% 	lager:info("websocket_info ~p \n ~p \n ~p \n ~p \n", [Name, Message, Req, State#client.name]),
+websocket_info({{uuid, Name}, {message, Message}}, Req, State) when erlang:is_list(Message) andalso erlang:is_list(Name) ->
 	CompleteMessage = lists:flatten(io_lib:format("~s", [Message])),
 	{reply, {text, erlang:list_to_binary(CompleteMessage)}, Req, State};
-websocket_info({{name, Name}, {message, Message}}, Req, State) when erlang:is_binary(Message) ->
-%% 	lager:info("websocket_info ~p \n ~p \n ~p \n ~p \n", [Name, Message, Req, State#client.name]),
+websocket_info({{uuid, Name}, {message, Message}}, Req, State) when erlang:is_binary(Message) ->
 	ListMessage = erlang:binary_to_list(Message),
-	websocket_info({{name, Name}, {message, ListMessage}}, Req, State);
-websocket_info({{name, Name}, {message, Message}}, Req, State) when erlang:is_binary(Name) ->
-%% 	lager:info("websocket_info ~p \n ~p \n ~p \n ~p \n", [Name, Message, Req, State#client.name]),
+	websocket_info({{uuid, Name}, {message, ListMessage}}, Req, State);
+websocket_info({{uuid, Name}, {message, Message}}, Req, State) when erlang:is_binary(Name) ->
 	ListName = erlang:binary_to_list(Name),
-	websocket_info({{name, ListName}, {message, Message}}, Req, State).
+	websocket_info({{uuid, ListName}, {message, Message}}, Req, State).
 
 %% Wird aufgerufen, wenn die Verbindung geschlossen wird
-websocket_terminate(_Reason, _Req, _State) ->
-%% 	lager:info("websocket_terminate ~p \n ~p \n ~p \n", [_Reason, _Req, _State#client.name]),
-	mnesia:dirty_delete(client, self()),
+websocket_terminate(_Reason, _Req, State) ->
+	lager:info("delete client ~p ", [State]),
+	mnesia:dirty_delete(player, self()),
+	DeleteClientMessage = lists:flatten(io_lib:format("60:~s:~p:~p", [State#player.uuid, State#player.score, 0])),
+	relay_message(DeleteClientMessage, State#player.uuid),
 	ok.
 
 %% Laedt alle Clients und startet die Nachrichtenvermittlung
 relay_message(Msg, Name) ->
-%% 	lager:info("relay_message ~p \n ~p \n", [Msg, Name]),
-	Clients = mnesia:dirty_all_keys(client),
-	relay_message(Msg, Name, Clients).
+	Players = mnesia:dirty_all_keys(player),
+	relay_message(Msg, Name, Players).
 
 %% Leitet die Nachrichten an alle Clients weiter
 relay_message(_Msg, _Name, []) ->
-%% 	lager:info("relay_message ~p \n ~p \n", [_Msg, _Name]),
 	ok;
-relay_message(Msg, Name, [Client|Rest]) ->
-%% 	lager:info("relay_message ~p \n ~p \n", [Msg, Name, [Client|Rest]]),
-	case Client =:= self() of
+relay_message(Msg, Name, [Player|Rest]) ->
+	case Player =:= self() of
 		false ->
-			Client ! {{name, Name}, {message, Msg}};
+			Player ! {{uuid, Name}, {message, Msg}};
 		_ ->
 			ok
 	end,
