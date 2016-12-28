@@ -17,6 +17,11 @@ init({tcp, http}, _Req, _Opts) ->
 
 %% Wird aufgerufen, sobald der Websocket erstellt wurde
 websocket_init(_TransportName, Req, _Opts) ->
+	
+	{CookieVal, Req2} = cowboy_req:cookies(Req),
+	
+	lager:info("~p", [CookieVal]),
+	
 	Player = #player { pid = self(), uuid = uuid:to_string(uuid:v4()), score=0 },
 	lager:info("new player : ~p ~p", [Player#player.uuid, Player#player.pid]),
 	mnesia:dirty_write(Player),
@@ -34,7 +39,7 @@ websocket_handle({text, Msg}, Req, State) ->
 		MessageNr == "10"->lager:info("generate uuid"),
 						   UUID = uuid:to_string(uuid:v4()),
 						   UUIDasMessage = lists:flatten(io_lib:format("10:~s", [UUID])),
-						   relay_message(UUIDasMessage, State#player.uuid);
+						   relay_message_uuid(UUIDasMessage, State#player.uuid);
 		MessageNr == "20"->lager:info("mine hash"),
 						   String = binary_to_list(Msg),
 						   Idx = string:cspan(String, ":"),
@@ -42,7 +47,7 @@ websocket_handle({text, Msg}, Req, State) ->
 						   {Hash, Count} = my_sha:generate_sha(UUID, crypto:hash_init(md5), 0),
 						   Player = #player {pid=State#player.pid, uuid = State#player.uuid, score = Count, current_uuid=UUID},
 						   mnesia:dirty_write(Player),
-						   RelayMessage = lists:flatten(io_lib:format("20:~s", [Hash])),
+						   RelayMessage = lists:flatten(io_lib:format("20:~s:~w", [Hash, Count])),
 						   relay_message(RelayMessage, State#player.uuid);
 		MessageNr == "30"->lager:info("reset"),
 						   RelayMessage = lists:flatten(io_lib:format("30:~s", ["RESET"])),
@@ -101,6 +106,17 @@ relay_message(Msg, Name) ->
 relay_message(_Msg, _Name, []) ->
 	ok;
 relay_message(Msg, Name, [Player|Rest]) ->
+	Player ! {{uuid, Name}, {message, Msg}},
+	relay_message(Msg, Name, Rest).
+
+%% send messages with generated uuid
+relay_message_uuid(Msg, Name) ->
+	Players = mnesia:dirty_all_keys(player),
+	relay_message_uuid(Msg, Name, Players).
+
+relay_message_uuid(_Msg, _Name, []) ->
+	ok;
+relay_message_uuid(Msg, Name, [Player|Rest]) ->
 	case Player =:= self() of
 		false ->
 			Player ! {{uuid, Name}, {message, Msg}};

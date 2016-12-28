@@ -1,8 +1,11 @@
 "use strict";
 var socket = new WebSocket("ws://localhost:5555/hashchain");
 
+var my_cookie = guid();
+
 function init() {
 	console.log("init client");
+	document.cookie = my_cookie;
 	if (!("WebSocket" in window)) {
 		// console.log("websockets not supported");
 		document.getElementById("status").innerHTML = "websockets are not supported";
@@ -12,6 +15,8 @@ function init() {
 		document.getElementById("status").innerHTML = "websockets are supported";
 		document.getElementById("status").className = "status_block_ok";
 	}
+	
+	document.getElementById("dataUUID0").innerHTML = my_cookie;
 };
 
 init();
@@ -181,3 +186,14 @@ function stop() {
 		console.log('websocket is not connected');
 	}
 }
+
+// http://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript
+function guid() {
+	  function s4() {
+	    return Math.floor((1 + Math.random()) * 0x10000)
+	      .toString(16)
+	      .substring(1);
+	  }
+	  return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+	    s4() + '-' + s4() + s4() + s4();
+	}

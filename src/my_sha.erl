@@ -28,7 +28,6 @@ generate_sha(Value, Context, Count) ->
 		true -> generate_sha(Value, New_context, Count+1)
 	end.
 	
-
 %% See http://sacharya.com/tag/integer-to-hex-in-erlang/
 sha_hex(S) ->
 	SHA_bin =  crypto:hash(sha256, S),
