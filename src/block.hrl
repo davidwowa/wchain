@@ -1,1 +1,1 @@
--record(player, { pid, uuid, score, current_uuid, init_uuid }).
+-record(player, { pid, uuid, score, current_uuid, init_uuid, current_score, current_hash }).

@@ -1,7 +1,7 @@
 "use strict";
 var socket = new WebSocket("ws://localhost:5555/hashchain");
 
-var my_cookie = guid();
+var my_cookie = "uuid="+guid();
 
 function init() {
 	console.log("init client");
@@ -15,8 +15,7 @@ function init() {
 		document.getElementById("status").innerHTML = "websockets are supported";
 		document.getElementById("status").className = "status_block_ok";
 	}
-	
-	document.getElementById("dataUUID0").innerHTML = my_cookie;
+	document.getElementById("youUUID").innerHTML = my_cookie;
 };
 
 init();
@@ -31,9 +30,8 @@ socket.onmessage = function(messageEvent) {
 	var message = messageEvent.data;
 	if (message.substring(0, 2) == "10") {
 		console.log("get random uuid " + message);
-		document.getElementById("dataUUID0").innerHTML = message.substring(3,
-				message.length);
-	
+		document.getElementById("dataUUID0").innerHTML = guid();	
+		//--
 		var div = document.createElement("div");
 		div.id = "uuid" + message;
 		div.className = "clients_block_uuid";
@@ -42,11 +40,10 @@ socket.onmessage = function(messageEvent) {
 	} else if (message.substring(0, 2) == "20") {
 		document.getElementById("buttonUuid").disabled = true;
 		document.getElementById("buttonReset").disabled = false;
-		
 		console.log("mined hash " + message);
 		document.getElementById("dataHash0").innerHTML = message.substring(3,
 				message.length);
-
+		//--
 		var div = document.createElement("div");
 		div.id = "mine" + message;
 		div.className = "clients_block_hash";
@@ -58,7 +55,7 @@ socket.onmessage = function(messageEvent) {
 		document.getElementById("buttonReset").disabled = false;
 		document.getElementById("buttonStop").disabled = false;
 		document.getElementById("buttonMine").disabled = false;
-		
+		//--
 		var div = document.createElement("div");
 		div.id = "reset" + message;
 		div.className = "clients_block_reset";
@@ -69,7 +66,7 @@ socket.onmessage = function(messageEvent) {
 		document.getElementById("buttonUuid").disabled = true;
 		document.getElementById("buttonReset").disabled = true;
 		document.getElementById("buttonStop").disabled = true;
-		
+		//--
 		var div = document.createElement("div");
 		div.id = "stop" + message;
 		div.className = "clients_block_stop";
@@ -77,13 +74,12 @@ socket.onmessage = function(messageEvent) {
 		document.getElementById("clients").appendChild(div);
 	} else if (message.substring(0, 2) == "50") {
 		console.log("winner " + message);
-		
+		//--
 		var div = document.createElement("div");
 		div.id = "winner" + message;
 		div.className = "clients_block_hash";
 		div.innerHTML = "<span class=\"msg\">" + message + " WINNER</span>";
 		document.getElementById("clients").appendChild(div);
-	
 	} else if (message.substring(0, 2) == "60") {
 		console.log("update all clients " + message);
 		var div = document.createElement("div");

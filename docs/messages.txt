@@ -1,3 +1,5 @@
+second place is for init uuid reerved
+
 0 -> inital uuid
 10 -> get random uuid
 20:uuid -> mine
