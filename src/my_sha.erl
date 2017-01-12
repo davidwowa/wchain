@@ -20,10 +20,10 @@ generate_sha(Value, Context, Count) ->
 	New_context = crypto:hash_update(Context, Value),
 	Diggest = crypto:hash_final(New_context),
 	List = lists:flatten(list_to_hex(binary:bin_to_list(Diggest))),
-	lager:info("MD5: ~p ~p \n", [List, Count]),
-	Start = string:sub_string(List, 1, 1),
+%% 	lager:info("MD5: ~p ~p \n", [List, Count]),
+	Start = string:sub_string(List, 1, 2),
 	if
-		Start == "0"->
+		Start == "00"->
 			{List, Count};
 		true -> generate_sha(Value, New_context, Count+1)
 	end.

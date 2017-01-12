@@ -1,10 +1,11 @@
 "use strict";
 var socket = new WebSocket("ws://localhost:5555/hashchain");
 
-var my_cookie = "uuid="+guid();
+var my_uuid = guid();
+var my_cookie = "uuid=" + my_uuid;
 
 function init() {
-	console.log("init client");
+	console.log("init client with uuid " + my_cookie);
 	document.cookie = my_cookie;
 	if (!("WebSocket" in window)) {
 		// console.log("websockets not supported");
@@ -30,69 +31,94 @@ socket.onmessage = function(messageEvent) {
 	var message = messageEvent.data;
 	if (message.substring(0, 2) == "10") {
 		console.log("get random uuid " + message);
-		document.getElementById("dataUUID0").innerHTML = guid();	
-		//--
+		document.getElementById("dataUUID0").innerHTML = guid();
+		// --
 		var div = document.createElement("div");
 		div.id = "uuid" + message;
 		div.className = "clients_block_uuid";
-		div.innerHTML = "<span class=\"msg\">" + message + " UUID</span>";
-		document.getElementById("clients").appendChild(div);
+		div.innerHTML = "<span class=\"msg\">" + new Date().getTime() + "|"
+				+ message + "</span>";
+		// document.getElementById("clients").appendChild(div);
+		document.getElementById("log").insertBefore(div,
+				document.getElementById("log").firstChild);
 	} else if (message.substring(0, 2) == "20") {
 		document.getElementById("buttonUuid").disabled = true;
 		document.getElementById("buttonReset").disabled = false;
 		console.log("mined hash " + message);
 		document.getElementById("dataHash0").innerHTML = message.substring(3,
 				message.length);
-		//--
+		// --
 		var div = document.createElement("div");
 		div.id = "mine" + message;
 		div.className = "clients_block_hash";
-		div.innerHTML = "<span class=\"msg\">" + message + " HASH</span>";
-		document.getElementById("clients").appendChild(div);
+		div.innerHTML = "<span class=\"msg\">" + new Date().getTime() + "|"
+				+ message + "</span>";
+		document.getElementById("log").insertBefore(div,
+				document.getElementById("log").firstChild);
 	} else if (message.substring(0, 2) == "30") {
 		console.log("reset " + message);
 		document.getElementById("buttonUuid").disabled = false;
 		document.getElementById("buttonReset").disabled = false;
 		document.getElementById("buttonStop").disabled = false;
 		document.getElementById("buttonMine").disabled = false;
-		//--
+		// --
 		var div = document.createElement("div");
 		div.id = "reset" + message;
 		div.className = "clients_block_reset";
-		div.innerHTML = "<span class=\"msg\">" + message + " RESET</span>";
-		document.getElementById("clients").appendChild(div);
+		div.innerHTML = "<span class=\"msg\">" + new Date().getTime() + "|"
+				+ message + "</span>";
+		document.getElementById("log").insertBefore(div,
+				document.getElementById("log").firstChild);
 	} else if (message.substring(0, 2) == "40") {
 		console.log("stop " + message);
 		document.getElementById("buttonUuid").disabled = true;
 		document.getElementById("buttonReset").disabled = true;
 		document.getElementById("buttonStop").disabled = true;
-		//--
+		// --
 		var div = document.createElement("div");
 		div.id = "stop" + message;
 		div.className = "clients_block_stop";
-		div.innerHTML = "<span class=\"msg\">" + message + " STOP</span>";
-		document.getElementById("clients").appendChild(div);
+		div.innerHTML = "<span class=\"msg\">" + new Date().getTime() + "|"
+				+ message + "</span>";
+		document.getElementById("log").insertBefore(div,
+				document.getElementById("log").firstChild);
 	} else if (message.substring(0, 2) == "50") {
 		console.log("winner " + message);
-		//--
+		// --
+		document.getElementById("buttonUuid").disabled = true;
+		document.getElementById("buttonReset").disabled = false;
+		document.getElementById("buttonStop").disabled = true;
+		document.getElementById("buttonMine").disabled = true;
+		
 		var div = document.createElement("div");
 		div.id = "winner" + message;
-		div.className = "clients_block_hash";
-		div.innerHTML = "<span class=\"msg\">" + message + " WINNER</span>";
-		document.getElementById("clients").appendChild(div);
+		div.className = "winner";
+		
+		if(my_uuid == message.substring(3, message.length)){
+			div.innerHTML = "<span class=\"msg\">" + new Date().getTime() + "|"
+			+" !!! YOU WIN !!!</span>";
+		}else{
+			div.innerHTML = "<span class=\"msg\">" + new Date().getTime() + "| Winner is : "
+			+ message.substring(3, message.length) + "</span>";
+		}
+		
+		document.getElementById("log").insertBefore(div,
+				document.getElementById("log").firstChild);
 	} else if (message.substring(0, 2) == "60") {
 		console.log("update all clients " + message);
 		var div = document.createElement("div");
-		div.id = "test" + messageEvent.data;
+		div.id = "client_update" + messageEvent.data;
 		if (message.substring(message.length - 1, message.length) == "1") {
 			div.className = "clients_block_online";
-			div.innerHTML = "<span class=\"msg\">" + message + " ONLINE</span>";
+			div.innerHTML = "<span class=\"msg\">" + new Date().getTime() + "|"
+					+ message + " ONLINE</span>";
 		} else {
 			div.className = "clients_block_offline";
-			div.innerHTML = "<span class=\"msg\">" + message
-					+ " OFFLINE</span>";
+			div.innerHTML = "<span class=\"msg\">" + new Date().getTime() + "|"
+					+ message + " OFFLINE</span>";
 		}
-		document.getElementById("clients").appendChild(div);
+		document.getElementById("log").insertBefore(div,
+				document.getElementById("log").firstChild);
 	} else {
 		console.log("unknown message " + message);
 	}
@@ -119,11 +145,13 @@ function generateUUID() {
 	if (socket.readyState == socket.OPEN) {
 		console.log("10: get random UUID");
 		socket.send("10");
-		
+
 		var div = document.createElement("div");
 		div.className = "clients_block_uuid";
-		div.innerHTML = "<span class=\"msg\">SEND GENERATE UUID</span>";
-		document.getElementById("clients").appendChild(div);
+		div.innerHTML = "<span class=\"msg\">" + new Date().getTime()
+				+ " GENERATE UUID...</span>";
+		document.getElementById("log").insertBefore(div,
+				document.getElementById("log").firstChild);
 	} else {
 		console.log('websocket is not connected');
 	}
@@ -135,12 +163,14 @@ function mine() {
 		console.log("mine");
 		socket.send("20: " + document.getElementById("dataUUID0").innerHTML);
 		document.getElementById("buttonMine").disabled = true;
-	
+
 		document.getElementById("buttonReset").disabled = false;
 		var div = document.createElement("div");
 		div.className = "clients_block_hash";
-		div.innerHTML = "<span class=\"msg\">BEGINNING WITH MINING</span>";
-		document.getElementById("clients").appendChild(div);
+		div.innerHTML = "<span class=\"msg\">" + new Date().getTime()
+				+ " MINING...</span>";
+		document.getElementById("log").insertBefore(div,
+				document.getElementById("log").firstChild);
 	} else {
 		console.log('websocket is not connected');
 	}
@@ -155,11 +185,13 @@ function reset() {
 		document.getElementById("buttonReset").disabled = false;
 		document.getElementById("buttonStop").disabled = false;
 		document.getElementById("buttonMine").disabled = false;
-		
+
 		var div = document.createElement("div");
 		div.className = "clients_block_reset";
-		div.innerHTML = "<span class=\"msg\">MY RESET</span>";
-		document.getElementById("clients").appendChild(div);
+		div.innerHTML = "<span class=\"msg\">" + new Date().getTime()
+				+ " RESET...</span>";
+		document.getElementById("log").insertBefore(div,
+				document.getElementById("log").firstChild);
 	} else {
 		console.log('websocket is not connected');
 	}
@@ -173,11 +205,13 @@ function stop() {
 		document.getElementById("buttonUuid").disabled = true;
 		document.getElementById("buttonReset").disabled = true;
 		document.getElementById("buttonStop").disabled = true;
-		
+
 		var div = document.createElement("div");
 		div.className = "clients_block_stop";
-		div.innerHTML = "<span class=\"msg\">MY STOP</span>";
-		document.getElementById("clients").appendChild(div);
+		div.innerHTML = "<span class=\"msg\">" + new Date().getTime()
+				+ " STOP</span>";
+		document.getElementById("log").insertBefore(div,
+				document.getElementById("log").firstChild);
 	} else {
 		console.log('websocket is not connected');
 	}
@@ -185,11 +219,10 @@ function stop() {
 
 // http://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript
 function guid() {
-	  function s4() {
-	    return Math.floor((1 + Math.random()) * 0x10000)
-	      .toString(16)
-	      .substring(1);
-	  }
-	  return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
-	    s4() + '-' + s4() + s4() + s4();
+	function s4() {
+		return Math.floor((1 + Math.random()) * 0x10000).toString(16)
+				.substring(1);
 	}
+	return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4()
+			+ s4() + s4();
+}
