@@ -1,9 +1,8 @@
 second place is for init uuid reerved
 
-0 -> inital uuid
 10 -> get random uuid
-20:uuid -> mine
+20 -> mine
 30 -> reset
 40 -> stop
 50 -> winner
-60 -> all clients
+60 -> online or offline clients

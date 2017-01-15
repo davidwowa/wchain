@@ -12,7 +12,6 @@
 -export([find_winner/0]).
 -export([show_all_players/0]).
 
-
 %% Wird beim initialen Verbindungsaufbau aufgerufen und upgradet das Protokoll auf einen Websocket
 init({tcp, http}, _Req, _Opts) ->
 	{upgrade, protocol, cowboy_websocket}.
@@ -71,7 +70,7 @@ generate_new_uuids()->
 						UUIDasMessage = lists:flatten(io_lib:format("10:~s:~s", [Player#player.init_uuid, UUID])),
 						Player2 = Player#player {uuid = UUID},
 						mnesia:dirty_write(Player2),
-						relay_message_uuid(UUIDasMessage, Player#player.init_uuid),
+						relay_message(UUIDasMessage, Player#player.init_uuid),
 						[]end,
 	case mnesia:is_transaction() of
 		true -> mnesia:foldl(Iterator,[],player);
@@ -83,7 +82,7 @@ generate_new_uuids()->
 mine_hash()->
 	lager:info("mine..."),
 	Iterator =  fun(Player,_) ->  
-						{Hash, Count} = my_sha:generate_sha(Player#player.uuid, crypto:hash_init(md5), 0),
+						{Hash, Count} = my_sha:generate_hash(Player#player.uuid, crypto:hash_init(md5), 0),
 						NewScore = Player#player.score + Count,
 						Player2 = Player#player {current_hash = Hash, current_score = Count, score = NewScore },
 						mnesia:dirty_write(Player2),
@@ -109,13 +108,13 @@ find_winner()->
 	RelayMessage = lists:flatten(io_lib:format("50:~s", [Player#player.init_uuid])),
 	relay_message(RelayMessage, Player#player.init_uuid).
 
-find_min_score([H|T]) -> find_min_score(H ,T).
+find_min_score([H|T]) -> find_min_score(H, T).
 
 find_min_score(Winner, []) -> Winner;
-find_min_score(Winner ,[H|T]) -> 
+find_min_score(Winner, [H|T]) -> 
 %% 	lager:info("winner -> ~p ", [Winner#player.score]),
 	if H#player.score =< Winner#player.score
-		-> find_min_score(H,T);
+		-> find_min_score(H, T);
 	true -> find_min_score(Winner, T)
 	end.
 		
@@ -150,17 +149,17 @@ relay_message(Msg, Name, [Player|Rest]) ->
 	relay_message(Msg, Name, Rest).
 
 %% send messages with generated uuid
-relay_message_uuid(Msg, Name) ->
-	Players = mnesia:dirty_all_keys(player),
-	relay_message_uuid(Msg, Name, Players).
-
-relay_message_uuid(_Msg, _Name, []) ->
-	ok;
-relay_message_uuid(Msg, Name, [Player|Rest]) ->
-	case Player =:= self() of
-		false ->
-			Player ! {{init_uuid, Name}, {message, Msg}};
-		_ ->
-			ok
-	end,
-	relay_message(Msg, Name, Rest).
+%% relay_message_uuid(Msg, Name) ->
+%% 	Players = mnesia:dirty_all_keys(player),
+%% 	relay_message_uuid(Msg, Name, Players).
+%% 
+%% relay_message_uuid(_Msg, _Name, []) ->
+%% 	ok;
+%% relay_message_uuid(Msg, Name, [Player|Rest]) ->
+%% 	case Player =:= self() of
+%% 		false ->
+%% 			Player ! {{init_uuid, Name}, {message, Msg}};
+%% 		_ ->
+%% 			ok
+%% 	end,
+%% 	relay_message(Msg, Name, Rest).

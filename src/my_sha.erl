@@ -7,16 +7,16 @@
 %% ====================================================================
 %% API functions
 %% ====================================================================
--export([generate_sha/3]).
+-export([generate_hash/3]).
 -export([sha_hex/1]).
 %% ====================================================================
 %% Internal functions
 %% ====================================================================
 
-generate_sha(_, Context, 1000) -> 
+generate_hash(_, Context, 10000) -> 
 	Digest = crypto:hash_final(Context),
-	{lists:flatten(list_to_hex(binary:bin_to_list(Digest))), 1000};
-generate_sha(Value, Context, Count) ->
+	{lists:flatten(list_to_hex(binary:bin_to_list(Digest))), 10000};
+generate_hash(Value, Context, Count) ->
 	New_context = crypto:hash_update(Context, Value),
 	Diggest = crypto:hash_final(New_context),
 	List = lists:flatten(list_to_hex(binary:bin_to_list(Diggest))),
@@ -25,7 +25,7 @@ generate_sha(Value, Context, Count) ->
 	if
 		Start == "00"->
 			{List, Count};
-		true -> generate_sha(Value, New_context, Count+1)
+		true -> generate_hash(Value, New_context, Count+1)
 	end.
 	
 %% See http://sacharya.com/tag/integer-to-hex-in-erlang/

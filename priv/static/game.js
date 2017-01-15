@@ -5,24 +5,24 @@ var my_uuid = guid();
 var my_cookie = "uuid=" + my_uuid;
 
 function init() {
-	console.log("init client with uuid " + my_cookie);
+	console.log("init client with uuid " + my_uuid);
 	document.cookie = my_cookie;
 	if (!("WebSocket" in window)) {
-		// console.log("websockets not supported");
 		document.getElementById("status").innerHTML = "websockets are not supported";
 		document.getElementById("status").className = "status_block_error";
 	} else {
-		// console.log("websockets are supported");
 		document.getElementById("status").innerHTML = "websockets are supported";
 		document.getElementById("status").className = "status_block_ok";
 	}
-	document.getElementById("youUUID").innerHTML = my_cookie;
+	// set inital data
+	document.getElementById("youUUID").innerHTML = my_uuid;
+	document.getElementById("dataUUID0").innerHTML = my_uuid
 };
 
 init();
 
 socket.onopen = function() {
-	document.getElementById("status").innerHTML = "connection is open";
+	document.getElementById("status").innerHTML = "connection ok";
 	document.getElementById("status").className = "status_block_ok";
 };
 
@@ -30,8 +30,11 @@ socket.onopen = function() {
 socket.onmessage = function(messageEvent) {
 	var message = messageEvent.data;
 	if (message.substring(0, 2) == "10") {
-		console.log("get random uuid " + message);
-		document.getElementById("dataUUID0").innerHTML = guid();
+		console.log(message);
+		if (my_uuid.valueOf() == message.substring(3, 39).valueOf()) {
+			document.getElementById("dataUUID0").innerHTML = message.substring(
+					(message.length - 36), message.length);
+		}
 		// --
 		var div = document.createElement("div");
 		div.id = "uuid" + message;
@@ -44,7 +47,7 @@ socket.onmessage = function(messageEvent) {
 	} else if (message.substring(0, 2) == "20") {
 		document.getElementById("buttonUuid").disabled = true;
 		document.getElementById("buttonReset").disabled = false;
-		console.log("mined hash " + message);
+		console.log(message);
 		document.getElementById("dataHash0").innerHTML = message.substring(3,
 				message.length);
 		// --
@@ -56,7 +59,7 @@ socket.onmessage = function(messageEvent) {
 		document.getElementById("log").insertBefore(div,
 				document.getElementById("log").firstChild);
 	} else if (message.substring(0, 2) == "30") {
-		console.log("reset " + message);
+		console.log(message);
 		document.getElementById("buttonUuid").disabled = false;
 		document.getElementById("buttonReset").disabled = false;
 		document.getElementById("buttonStop").disabled = false;
@@ -70,7 +73,7 @@ socket.onmessage = function(messageEvent) {
 		document.getElementById("log").insertBefore(div,
 				document.getElementById("log").firstChild);
 	} else if (message.substring(0, 2) == "40") {
-		console.log("stop " + message);
+		console.log(message);
 		document.getElementById("buttonUuid").disabled = true;
 		document.getElementById("buttonReset").disabled = true;
 		document.getElementById("buttonStop").disabled = true;
@@ -83,29 +86,27 @@ socket.onmessage = function(messageEvent) {
 		document.getElementById("log").insertBefore(div,
 				document.getElementById("log").firstChild);
 	} else if (message.substring(0, 2) == "50") {
-		console.log("winner " + message);
+		console.log(message);
 		// --
 		document.getElementById("buttonUuid").disabled = true;
 		document.getElementById("buttonReset").disabled = false;
 		document.getElementById("buttonStop").disabled = true;
 		document.getElementById("buttonMine").disabled = true;
-		
+
 		var div = document.createElement("div");
 		div.id = "winner" + message;
 		div.className = "winner";
-		
-		if(my_uuid == message.substring(3, message.length)){
-			div.innerHTML = "<span class=\"msg\">" + new Date().getTime() + "|"
-			+" !!! YOU WIN !!!</span>";
-		}else{
-			div.innerHTML = "<span class=\"msg\">" + new Date().getTime() + "| Winner is : "
-			+ message.substring(3, message.length) + "</span>";
+
+		if (my_uuid == message.substring(3, message.length)) {
+			div.innerHTML = "<span class=\"msg\">!!! YOU WIN !!!</span>";
+		} else {
+			div.innerHTML = "<span class=\"msg\"> Winner is : "
+					+ message.substring(3, message.length) + "</span>";
 		}
-		
 		document.getElementById("log").insertBefore(div,
 				document.getElementById("log").firstChild);
 	} else if (message.substring(0, 2) == "60") {
-		console.log("update all clients " + message);
+		console.log(message);
 		var div = document.createElement("div");
 		div.id = "client_update" + messageEvent.data;
 		if (message.substring(message.length - 1, message.length) == "1") {
@@ -120,26 +121,28 @@ socket.onmessage = function(messageEvent) {
 		document.getElementById("log").insertBefore(div,
 				document.getElementById("log").firstChild);
 	} else {
+		div.className = "clients_block_offline";
+		div.innerHTML = "<span class=\"msg\">" + new Date().getTime() + "|"
+				+ message + " UNKNOWN </span>";
+
+		document.getElementById("log").insertBefore(div,
+				document.getElementById("log").firstChild);
 		console.log("unknown message " + message);
 	}
 };
 
 // callback-Funktion wird gerufen, wenn eine Fehler auftritt
 socket.onerror = function(errorEvent) {
-	// console.log("Error! Die Verbindung wurde unerwartet geschlossen");
 	document.getElementById("status").innerHTML = "<p><span style=\"color: red;\">error! connection lost</span></p>";
 };
 
 socket.onclose = function(closeEvent) {
-	// console.log('Die Verbindung wurde geschlossen --- Code: ' +
-	// closeEvent.code
-	// + ' --- Grund: ' + closeEvent.reason);
 	document.getElementById("status").innerHTML = 'Connection closed, Code: '
 			+ closeEvent.code + ' reason: ' + closeEvent.reason + '</span></p>';
 	document.getElementById("status").className = "status_block_error";
 };
 
-// game logic
+// game buttons
 function generateUUID() {
 	console.log("Generate uuid");
 	if (socket.readyState == socket.OPEN) {
@@ -160,7 +163,7 @@ function generateUUID() {
 function mine() {
 	console.log("mine");
 	if (socket.readyState == socket.OPEN) {
-		console.log("mine");
+		console.log("20: mine");
 		socket.send("20: " + document.getElementById("dataUUID0").innerHTML);
 		document.getElementById("buttonMine").disabled = true;
 
@@ -179,7 +182,7 @@ function mine() {
 function reset() {
 	console.log("reset");
 	if (socket.readyState == socket.OPEN) {
-		console.log("reset");
+		console.log("30: reset");
 		socket.send("30");
 		document.getElementById("buttonUuid").disabled = false;
 		document.getElementById("buttonReset").disabled = false;
@@ -200,7 +203,7 @@ function reset() {
 function stop() {
 	console.log("reset");
 	if (socket.readyState == socket.OPEN) {
-		console.log("reset");
+		console.log("40: reset");
 		socket.send("40");
 		document.getElementById("buttonUuid").disabled = true;
 		document.getElementById("buttonReset").disabled = true;
